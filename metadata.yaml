@@ -1,3 +1,5 @@
 homepage: "https://addi.ai.kr/"
 documentation: "https://addi-1.gitbook.io/guide/part-7./"
 versions:
+  - sha: "f1231f0352ea5cc3b009628fd491eebbb4abe912"
+    changeNotes: "Finalize template for GTM gallery submission."
