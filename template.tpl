@@ -196,7 +196,7 @@ const getQueryParameters = require('getQueryParameters');
 
 const COOKIE_NAME = '_insight_uid';
 const GA_COOKIE = '_ga';
-const GCLID_COOKIE = '_gclid';
+const GCLID_COOKIE = '_insight_gclid';
 const PIXEL_ENDPOINT = 'https://cs.ptbwa.com/v1/';
 
 
@@ -243,6 +243,16 @@ function getOrStoreGclid() {
   return getCookieValues(GCLID_COOKIE)[0] || '';
 }
 
+function getUtmParameters() {
+  return {
+    utm_source: getQueryParameters('utm_source') || '',
+    utm_medium: getQueryParameters('utm_medium') || '',
+    utm_campaign: getQueryParameters('utm_campaign') || '',
+    utm_term: getQueryParameters('utm_term') || '',
+    utm_content: getQueryParameters('utm_content') || ''
+  };
+}
+
 function serialize(params) {
   var query = '';
   for (var key in params) {
@@ -259,6 +269,7 @@ function serialize(params) {
   const gaId = getCookieValues(GA_COOKIE)[0] || '';
   const gclid = getOrStoreGclid();
   const timestamp = getTimestampMillis();
+  const utmParameters = getUtmParameters();
   
   const payload = {
     pid: data.pixelId,
@@ -273,6 +284,11 @@ function serialize(params) {
     cid: userId,
     gid: gaId,
     gclid: gclid,
+    utm_source: utmParameters.utm_source,
+    utm_medium: utmParameters.utm_medium,
+    utm_campaign: utmParameters.utm_campaign,
+    utm_term: utmParameters.utm_term,
+    utm_content: utmParameters.utm_content,
     url: getUrl(),
     ref: getReferrerUrl(),
     ts: timestamp
@@ -467,7 +483,7 @@ ___WEB_PERMISSIONS___
                 "mapValue": [
                   {
                     "type": 1,
-                    "string": "_gclid"
+                    "string": "_insight_gclid"
                   },
                   {
                     "type": 1,
@@ -659,7 +675,7 @@ scenarios:
       eventType: 'page_view'
     });
 
-    assertApi('setCookie').wasCalledWith('_gclid', 'EAIaIQobChMI_test_gclid_value', {
+    assertApi('setCookie').wasCalledWith('_insight_gclid', 'EAIaIQobChMI_test_gclid_value', {
       'max-age': 60 * 60 * 24 * 90,
       'secure': true
     });
@@ -675,7 +691,7 @@ scenarios:
     
     // Cookie has stored gclid
     mock('getCookieValues', (cookieName) => {
-      if (cookieName === '_gclid') return ['EAIaIQobChMI_stored_gclid'];
+      if (cookieName === '_insight_gclid') return ['EAIaIQobChMI_stored_gclid'];
       return [];
     });
 
