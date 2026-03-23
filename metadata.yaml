@@ -1,5 +1,7 @@
 homepage: "https://addi.ai.kr/"
 documentation: "https://addi-1.gitbook.io/guide/part-7./"
 versions:
+  - sha: "1a8595dc17e28a7a6ede1ab1eb9c616ca6b79298"
+    changeNotes: "Update template to automatically capture and store gclid for Google Ads integration."
   - sha: "f1231f0352ea5cc3b009628fd491eebbb4abe912"
     changeNotes: "Finalize template for GTM gallery submission."
