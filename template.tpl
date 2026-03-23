@@ -192,9 +192,11 @@ const getTimestampMillis = require('getTimestampMillis');
 const sendPixel = require('sendPixel');
 const encodeUriComponent = require('encodeUriComponent');
 const JSON = require('JSON');
+const getQueryParameters = require('getQueryParameters');
 
 const COOKIE_NAME = '_insight_uid';
 const GA_COOKIE = '_ga';
+const GCLID_COOKIE = '_gclid';
 const PIXEL_ENDPOINT = 'https://cs.ptbwa.com/v1/';
 
 
@@ -229,6 +231,17 @@ function getOrCreateUid(cookieName) {
   return uid;
 }
 
+function getOrStoreGclid() {
+  const urlGclid = getQueryParameters('gclid');
+  if (urlGclid) {
+    setCookie(GCLID_COOKIE, urlGclid, {
+      'max-age': 60 * 60 * 24 * 90,
+      'secure': true
+    });
+    return urlGclid;
+  }
+  return getCookieValues(GCLID_COOKIE)[0] || '';
+}
 
 function serialize(params) {
   var query = '';
@@ -244,6 +257,7 @@ function serialize(params) {
 (function () {
   const userId = getOrCreateUid(COOKIE_NAME);
   const gaId = getCookieValues(GA_COOKIE)[0] || '';
+  const gclid = getOrStoreGclid();
   const timestamp = getTimestampMillis();
   
   const payload = {
@@ -258,6 +272,7 @@ function serialize(params) {
     conv_meta: data.conversionMeta || '',
     cid: userId,
     gid: gaId,
+    gclid: gclid,
     url: getUrl(),
     ref: getReferrerUrl(),
     ts: timestamp
@@ -406,6 +421,53 @@ ___WEB_PERMISSIONS___
                   {
                     "type": 1,
                     "string": "_insight_uid"
+                  },
+                  {
+                    "type": 1,
+                    "string": "*"
+                  },
+                  {
+                    "type": 1,
+                    "string": "*"
+                  },
+                  {
+                    "type": 1,
+                    "string": "secure"
+                  },
+                  {
+                    "type": 1,
+                    "string": "any"
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "name"
+                  },
+                  {
+                    "type": 1,
+                    "string": "domain"
+                  },
+                  {
+                    "type": 1,
+                    "string": "path"
+                  },
+                  {
+                    "type": 1,
+                    "string": "secure"
+                  },
+                  {
+                    "type": 1,
+                    "string": "session"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "_gclid"
                   },
                   {
                     "type": 1,
@@ -579,8 +641,8 @@ scenarios:
     assertThat(mockUrl[0]).contains('scroll=80');
 setup: "const _pixelID = 'sk_123456789012345678901234567890123';\n\n// Need to be\
   \ mocked to fix the UUID\nmock('generateRandom', 1);\nmock('getTimestampMillis',\
-  \ 1);\nmock('getUrl', 'ptbwa.com');\nmock('getReferrerUrl', 'clien.net');\n\nmock('getCookieValues',\
-  \ () => []); \nmock('setCookie', () => {});"
+  \ 1);\nmock('getUrl', 'ptbwa.com');\nmock('getReferrerUrl', 'clien.net');\nmock('getQueryParameters',\
+  \ () => '');\n\nmock('getCookieValues', () => []); \nmock('setCookie', () => {});"
 
 
 ___NOTES___

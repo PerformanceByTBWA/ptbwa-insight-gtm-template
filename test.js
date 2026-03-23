@@ -60,3 +60,83 @@ assertThat(sentUrl).contains('conv_value=100.00');
 // JSON 데이터가 올바르게 URL 인코딩되었는지 검증
 // {"currency":"KRW"} -> %7B%22currency%22%3A%22KRW%22%7D
 assertThat(sentUrl).contains('conv_meta=%7B%22currency%22%3A%22KRW%22%7D');
+
+// ──────────────────────────────────────────────────────
+// [5] gclid 테스트 케이스
+// ──────────────────────────────────────────────────────
+
+// === 테스트 5-1: URL 파라미터에 gclid가 있을 때 payload에 포함되어야 함 ===
+var gclidUrlTestUrls = [];
+mock('sendPixel', function(url, onSuccess, onFailure) {
+  gclidUrlTestUrls.push(url);
+  if (onSuccess) onSuccess();
+});
+
+// URL에 gclid 파라미터가 있는 경우를 시뮬레이션
+mock('getQueryParameters', (param) => {
+  if (param === 'gclid') return 'EAIaIQobChMI_test_gclid_value';
+  return '';
+});
+mock('getCookieValues', (cookieName) => {
+  if (cookieName === '_insight_uid') return ['test-cid-1111'];
+  if (cookieName === '_ga') return ['GA1.1.999999999.111111111'];
+  return []; // _gclid 쿠키는 없음
+});
+
+runCode({
+  pixelId: 'ptbwa-abc123',
+  eventType: 'page_view'
+});
+
+assertApi('gtmOnSuccess').wasCalled();
+assertThat(gclidUrlTestUrls[0]).contains('gclid=EAIaIQobChMI_test_gclid_value');
+// gclid가 URL에 있을 때 setCookie가 호출(저장)되는지 확인
+assertApi('setCookie').wasCalled();
+
+// === 테스트 5-2: URL에 gclid가 없고 쿠키에 저장된 gclid가 있을 때 fallback ===
+var gclidCookieTestUrls = [];
+mock('sendPixel', function(url, onSuccess, onFailure) {
+  gclidCookieTestUrls.push(url);
+  if (onSuccess) onSuccess();
+});
+
+// URL에는 gclid 없음
+mock('getQueryParameters', (param) => '');
+// 쿠키에 이전에 저장된 gclid 존재
+mock('getCookieValues', (cookieName) => {
+  if (cookieName === '_insight_uid') return ['test-cid-1111'];
+  if (cookieName === '_ga') return ['GA1.1.999999999.111111111'];
+  if (cookieName === '_gclid') return ['EAIaIQobChMI_stored_gclid'];
+  return [];
+});
+
+runCode({
+  pixelId: 'ptbwa-abc123',
+  eventType: 'page_view'
+});
+
+assertApi('gtmOnSuccess').wasCalled();
+assertThat(gclidCookieTestUrls[0]).contains('gclid=EAIaIQobChMI_stored_gclid');
+
+// === 테스트 5-3: URL과 쿠키 모두 gclid 없을 때 빈 값으로 전송 ===
+var gclidEmptyTestUrls = [];
+mock('sendPixel', function(url, onSuccess, onFailure) {
+  gclidEmptyTestUrls.push(url);
+  if (onSuccess) onSuccess();
+});
+
+mock('getQueryParameters', (param) => '');
+mock('getCookieValues', (cookieName) => {
+  if (cookieName === '_insight_uid') return ['test-cid-1111'];
+  if (cookieName === '_ga') return ['GA1.1.999999999.111111111'];
+  return []; // _gclid 쿠키도 없음
+});
+
+runCode({
+  pixelId: 'ptbwa-abc123',
+  eventType: 'page_view'
+});
+
+assertApi('gtmOnSuccess').wasCalled();
+// gclid= 파라미터가 존재하되 빈 값으로 전송
+assertThat(gclidEmptyTestUrls[0]).contains('gclid=');

@@ -19,6 +19,7 @@ The Ptbwa Insight Pixel template simplifies sending event data (page views, clic
 
 - **Comprehensive Tracking**: Supports standard events like page views, clicks, and scroll depth.
 - **Conversion Tracking**: Easily send conversion events (purchase, signup, order, etc.) with custom values and metadata.
+- **Google Ads Integration**: Automatically captures and conditionally stores \`gclid\` from URL query parameters to tracking interactions.
 - **Sandboxed JavaScript**: Built using GTM's secure sandboxed environment.
 - **Auto-Generated IDs**: Automatically handles unique event and user identification via cookies.
 
