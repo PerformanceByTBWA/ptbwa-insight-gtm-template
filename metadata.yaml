@@ -1,6 +1,8 @@
 homepage: "https://addi.ai.kr/"
 documentation: "https://addi-1.gitbook.io/guide/part-7./"
 versions:
+  - sha: "1cec32b5fa8b0ad91a4ee2ed00377a5bc1ea092f"
+    changeNotes: "Enhance GCLID/UTM parameter capture and fix broken brand thumbnail image."
   - sha: "966f5b49877f6d832808a0b076cbfe16e2a46885"
     changeNotes: "Fix brand.thumbnail MIME type from image/jpeg to image/png."
   - sha: "1a8595dc17e28a7a6ede1ab1eb9c616ca6b79298"
