@@ -1,6 +1,14 @@
+<div align="center">
+
 # Ptbwa Insight Pixel GTM Template
 
 This repository contains the GTM Template for **Insight Pixel**, allowing you to easily integrate behavioral and conversion tracking into your website using Google Tag Manager.
+
+**English** | [**한국어**](README.ko.md)
+
+</div>
+
+---
 
 ## Table of Contents
 
@@ -52,6 +60,9 @@ The Ptbwa Insight Pixel template simplifies sending event data (page views, clic
 4. Choose the **Event Type** you want to track.
 5. Set the appropriate **Trigger** (e.g., All Pages for `page_view`, or specific click triggers).
 6. **Preview** and **Publish** your container.
+
+> 📖 **New to GTM or tag templates?**  
+> Check out the [**Detailed Usage Guide**](docs/usage.md) for step-by-step instructions on importing the template, configuring each event type, setting up triggers, and verifying your setup with Preview Mode.
 
 ## License
 
