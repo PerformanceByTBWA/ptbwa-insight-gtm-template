@@ -131,6 +131,18 @@ ___TEMPLATE_PARAMETERS___
       {
         "value": "signin",
         "displayValue": "로그인"
+      },
+      {
+        "value": "refund",
+        "displayValue": "환불"
+      },
+      {
+        "value": "apply_coupon",
+        "displayValue": "쿠폰 적용"
+      },
+      {
+        "value": "download_coupon",
+        "displayValue": "쿠폰 다운로드"
       }
     ],
     "simpleValueType": true,
@@ -161,6 +173,16 @@ ___TEMPLATE_PARAMETERS___
       {
         "paramName": "conversionType",
         "paramValue": "order",
+        "type": "EQUALS"
+      },
+      {
+        "paramName": "conversionType",
+        "paramValue": "refund",
+        "type": "EQUALS"
+      },
+      {
+        "paramName": "conversionType",
+        "paramValue": "apply_coupon",
         "type": "EQUALS"
       }
     ]
@@ -592,17 +614,16 @@ scenarios:
 
     const mockData = {
       pixelId: _pixelID,
-      eventType: 'purchase',
+      eventType: 'conversion',
       conversionType: 'purchase',
-      conversionValue: '49.99',
-      // conversionMeta: '{"coupon":"NEW50"}'
+      conversionValue: '49.99'
     };
     runCode(mockData);
 
 
     assertApi('sendPixel').wasCalled();
     assertApi('gtmOnSuccess').wasCalled();
-    assertThat(mockUrl[0]).contains('ev=purchase');
+    assertThat(mockUrl[0]).contains('ev=conversion');
     assertThat(mockUrl[0]).contains('conv_type=purchase');
     assertThat(mockUrl[0]).contains('conv_value=49.99');
     // assertThat(mockUrl[0]).contains('conv_meta=%7B%22coupon%22%3A%22NEW50%22%7D');
@@ -618,7 +639,7 @@ scenarios:
 
     const mockData = {
       pixelId: _pixelID,
-      eventType: 'order',
+      eventType: 'conversion',
       conversionType: 'order',
       conversionValue: '49.99',
       conversionMeta: '{"coupon":"NEW50"}'
@@ -628,10 +649,52 @@ scenarios:
 
     assertApi('sendPixel').wasCalled();
     assertApi('gtmOnSuccess').wasCalled();
-    assertThat(mockUrl[0]).contains('ev=order');
+    assertThat(mockUrl[0]).contains('ev=conversion');
     assertThat(mockUrl[0]).contains('conv_type=order');
     assertThat(mockUrl[0]).contains('conv_value=49.99');
     assertThat(mockUrl[0]).contains('conv_meta=%7B%22coupon%22%3A%22NEW50%22%7D');
+- name: '[PTBWA] Conversion Signup event is serialized and sent'
+  code: |-
+    var mockUrl = [];
+    mock('sendPixel', function(url, onSuccess, onFailure) {
+      mockUrl.push(url);
+      if (typeof onSuccess == 'function') {
+        onSuccess();
+      }
+    });
+
+    const mockData = {
+      pixelId: _pixelID,
+      eventType: 'conversion',
+      conversionType: 'signup'
+    };
+    runCode(mockData);
+
+    assertApi('sendPixel').wasCalled();
+    assertApi('gtmOnSuccess').wasCalled();
+    assertThat(mockUrl[0]).contains('ev=conversion');
+    assertThat(mockUrl[0]).contains('conv_type=signup');
+- name: '[PTBWA] Conversion Signin event is serialized and sent'
+  code: |-
+    var mockUrl = [];
+    mock('sendPixel', function(url, onSuccess, onFailure) {
+      mockUrl.push(url);
+      if (typeof onSuccess == 'function') {
+        onSuccess();
+      }
+    });
+
+    const mockData = {
+      pixelId: _pixelID,
+      eventType: 'conversion',
+      conversionType: 'signin'
+    };
+    runCode(mockData);
+
+    assertApi('sendPixel').wasCalled();
+    assertApi('gtmOnSuccess').wasCalled();
+    assertThat(mockUrl[0]).contains('ev=conversion');
+    assertThat(mockUrl[0]).contains('conv_type=signin');
 - name: '[PTBWA] Cookie is set when not exists'
   code: |-
     var mockUrl = [];
@@ -717,6 +780,79 @@ scenarios:
 
     // query parameter gclid should be empty like gclid=& or at end like gclid=
     assertThat(mockUrl[0]).contains('gclid=');
+- name: '[PTBWA] Conversion Refund event is serialized and sent'
+  code: |-
+    var mockUrl = [];
+    mock('sendPixel', function(url, onSuccess, onFailure) {
+      mockUrl.push(url);
+      if (typeof onSuccess == 'function') {
+        onSuccess();
+      }
+    });
+
+    const mockData = {
+      pixelId: _pixelID,
+      eventType: 'conversion',
+      conversionType: 'refund',
+      conversionValue: '49000',
+      conversionMeta: '{"transaction_id":"ORDER-1000","reason":"return"}'
+    };
+    runCode(mockData);
+
+    assertApi('sendPixel').wasCalled();
+    assertApi('gtmOnSuccess').wasCalled();
+    assertThat(mockUrl[0]).contains('ev=conversion');
+    assertThat(mockUrl[0]).contains('conv_type=refund');
+    assertThat(mockUrl[0]).contains('conv_value=49000');
+    assertThat(mockUrl[0]).contains('conv_meta=%7B%22transaction_id%22%3A%22ORDER-1000%22%2C%22reason%22%3A%22return%22%7D');
+- name: '[PTBWA] Conversion Apply Coupon event is serialized and sent'
+  code: |-
+    var mockUrl = [];
+    mock('sendPixel', function(url, onSuccess, onFailure) {
+      mockUrl.push(url);
+      if (typeof onSuccess == 'function') {
+        onSuccess();
+      }
+    });
+
+    const mockData = {
+      pixelId: _pixelID,
+      eventType: 'conversion',
+      conversionType: 'apply_coupon',
+      conversionValue: '10000',
+      conversionMeta: '{"coupon_name":"WELCOME10"}'
+    };
+    runCode(mockData);
+
+    assertApi('sendPixel').wasCalled();
+    assertApi('gtmOnSuccess').wasCalled();
+    assertThat(mockUrl[0]).contains('ev=conversion');
+    assertThat(mockUrl[0]).contains('conv_type=apply_coupon');
+    assertThat(mockUrl[0]).contains('conv_value=10000');
+    assertThat(mockUrl[0]).contains('conv_meta=%7B%22coupon_name%22%3A%22WELCOME10%22%7D');
+- name: '[PTBWA] Conversion Download Coupon event is serialized and sent'
+  code: |-
+    var mockUrl = [];
+    mock('sendPixel', function(url, onSuccess, onFailure) {
+      mockUrl.push(url);
+      if (typeof onSuccess == 'function') {
+        onSuccess();
+      }
+    });
+
+    const mockData = {
+      pixelId: _pixelID,
+      eventType: 'conversion',
+      conversionType: 'download_coupon',
+      conversionMeta: '{"coupon_name":"SUMMER20"}'
+    };
+    runCode(mockData);
+
+    assertApi('sendPixel').wasCalled();
+    assertApi('gtmOnSuccess').wasCalled();
+    assertThat(mockUrl[0]).contains('ev=conversion');
+    assertThat(mockUrl[0]).contains('conv_type=download_coupon');
+    assertThat(mockUrl[0]).contains('conv_meta=%7B%22coupon_name%22%3A%22SUMMER20%22%7D');
 setup: "const _pixelID = 'sk_123456789012345678901234567890123';\n\n// Need to be\
   \ mocked to fix the UUID\nmock('generateRandom', 1);\nmock('getTimestampMillis',\
   \ 1);\nmock('getUrl', 'ptbwa.com');\nmock('getReferrerUrl', 'clien.net');\nmock('getQueryParameters',\
