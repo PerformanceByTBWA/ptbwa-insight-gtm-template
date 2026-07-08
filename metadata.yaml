@@ -1,6 +1,8 @@
 homepage: "https://addi.ai.kr/"
 documentation: "https://addi-1.gitbook.io/guide/part-7./"
 versions:
+  - sha: "4e78e649043b889cc700bdff5518c352db2c95cc"
+    changeNotes: "Add refund, apply_coupon, download_coupon conversionType options and fix existing test eventType values."
   - sha: "427ffd940137003ded2d2667b7dd67305a61cc92"
     changeNotes: "Add comprehensive English and Korean usage guides and update README with documentation links."
   - sha: "93f6de87194b85ee85ea980f19a77a4f4f8cf504"
